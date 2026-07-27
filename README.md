@@ -22,8 +22,18 @@ Luego abrir <http://localhost:5173> en el navegador.
 - **Historial**: todos los registros con filtros por sección, rango de fechas y búsqueda
   por número de guía o tipo. Muestra totales de KG, resumen por tipo, y permite
   **exportar a CSV** (se abre en Excel) e imprimir.
+- **Panadería**: producción del día. Se ingresa la cantidad (amasijos) de cada pan y el
+  sistema calcula el **total KG** (cantidad × rendimiento de la receta) y las
+  **Transformaciones Panadería** (consumo de cada insumo según las recetas, en unidades
+  de compra, igual que el Excel). Cada pan tiene su **formulario** (recetario con
+  materias primas, proceso y consumo del día). Se puede imprimir la tabla PAN, la tabla
+  de transformaciones y cada formulario por separado.
 - **Ajustes**: administrar secciones y sus tipos de transformación, descargar/importar
   **respaldos** en JSON, y borrar todo.
+
+Las recetas de panadería (32 productos, 36 insumos) están en `src/panaderia-data.js`,
+extraídas automáticamente del Excel `25-07-2026.xlsm`. Si cambia una receta o un
+rendimiento, se edita ese archivo.
 
 ## Dónde se guardan los datos
 

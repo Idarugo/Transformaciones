@@ -2,11 +2,13 @@ import { useEffect, useMemo, useState } from 'react'
 import { cargarDatos, guardarDatos } from './storage.js'
 import RegistroView from './components/RegistroView.jsx'
 import HistorialView from './components/HistorialView.jsx'
+import PanaderiaView from './components/PanaderiaView.jsx'
 import AjustesView from './components/AjustesView.jsx'
 
 const VISTAS = [
   { id: 'registro', etiqueta: 'Registro' },
   { id: 'historial', etiqueta: 'Historial' },
+  { id: 'panaderia', etiqueta: 'Panadería' },
   { id: 'ajustes', etiqueta: 'Ajustes' },
 ]
 
@@ -14,13 +16,14 @@ export default function App() {
   const inicial = useMemo(() => cargarDatos(), [])
   const [registros, setRegistros] = useState(inicial.registros)
   const [config, setConfig] = useState(inicial.config)
+  const [panaderia, setPanaderia] = useState(inicial.panaderia)
   const [vista, setVista] = useState('registro')
   const [editandoId, setEditandoId] = useState(null)
   const [aviso, setAviso] = useState(null)
 
   useEffect(() => {
-    guardarDatos({ registros, config })
-  }, [registros, config])
+    guardarDatos({ registros, config, panaderia })
+  }, [registros, config, panaderia])
 
   function mostrarAviso(texto) {
     setAviso(texto)
@@ -53,7 +56,20 @@ export default function App() {
   function importarDatos(datos) {
     setRegistros(datos.registros)
     setConfig(datos.config)
+    setPanaderia(datos.panaderia ?? {})
     mostrarAviso('Respaldo importado')
+  }
+
+  // Guarda la cantidad de amasijos de un pan para un día dado.
+  function cambiarCantidadPan(fecha, sku, cantidad) {
+    setPanaderia((prev) => {
+      const dia = { ...(prev[fecha] ?? {}) }
+      if (cantidad > 0) dia[sku] = cantidad
+      else delete dia[sku]
+      const siguiente = { ...prev, [fecha]: dia }
+      if (Object.keys(dia).length === 0) delete siguiente[fecha]
+      return siguiente
+    })
   }
 
   const registroEnEdicion = registros.find((r) => r.id === editandoId) ?? null
@@ -89,7 +105,7 @@ export default function App() {
         </div>
       </header>
 
-      <main className="contenido">
+      <main className={vista === 'panaderia' ? 'contenido contenido-ancha' : 'contenido'}>
         {vista === 'registro' && (
           <RegistroView
             registros={registros}
@@ -110,10 +126,14 @@ export default function App() {
             onEliminar={eliminarRegistro}
           />
         )}
+        {vista === 'panaderia' && (
+          <PanaderiaView panaderia={panaderia} onCambiarCantidad={cambiarCantidadPan} />
+        )}
         {vista === 'ajustes' && (
           <AjustesView
             registros={registros}
             config={config}
+            panaderia={panaderia}
             onCambiarConfig={setConfig}
             onImportar={importarDatos}
             onBorrarTodo={() => {

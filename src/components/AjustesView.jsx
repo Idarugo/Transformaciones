@@ -2,7 +2,7 @@ import { useRef, useState } from 'react'
 import { descargarBlob } from '../utils.js'
 import { CONFIG_DEFAULT } from '../config.js'
 
-export default function AjustesView({ registros, config, onCambiarConfig, onImportar, onBorrarTodo }) {
+export default function AjustesView({ registros, config, panaderia, onCambiarConfig, onImportar, onBorrarTodo }) {
   const [nuevaSeccion, setNuevaSeccion] = useState('')
   const [nuevosTipos, setNuevosTipos] = useState({})
   const refArchivo = useRef(null)
@@ -59,7 +59,7 @@ export default function AjustesView({ registros, config, onCambiarConfig, onImpo
 
   function exportarRespaldo() {
     const fecha = new Date().toISOString().slice(0, 10)
-    const blob = new Blob([JSON.stringify({ registros, config, version: 1 }, null, 2)], {
+    const blob = new Blob([JSON.stringify({ registros, config, panaderia, version: 1 }, null, 2)], {
       type: 'application/json',
     })
     descargarBlob(blob, `respaldo-transformaciones-${fecha}.json`)
@@ -80,6 +80,7 @@ export default function AjustesView({ registros, config, onCambiarConfig, onImpo
           onImportar({
             registros: datos.registros,
             config: datos.config && Array.isArray(datos.config.secciones) ? datos.config : CONFIG_DEFAULT,
+            panaderia: datos.panaderia && typeof datos.panaderia === 'object' ? datos.panaderia : {},
           })
         }
       } catch {

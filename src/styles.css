@@ -499,6 +499,213 @@ tfoot td {
   border-color: #fecaca;
 }
 
+/* ---------- Panadería ---------- */
+.contenido-ancha {
+  max-width: 1500px;
+}
+
+/* Tablas PAN y Transformaciones lado a lado, como en el Excel */
+.panaderia-columnas {
+  display: grid;
+  grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+  gap: 20px;
+  align-items: start;
+}
+
+@media (max-width: 1100px) {
+  .panaderia-columnas {
+    grid-template-columns: 1fr;
+  }
+}
+
+.fila-encabezado.sin-borde {
+  border-bottom: none;
+  padding-bottom: 0;
+  margin-bottom: 0;
+  align-items: end;
+}
+
+.campo-fecha-pan {
+  max-width: 220px;
+}
+
+.entrada-cantidad {
+  width: 90px;
+  min-height: 36px;
+  padding: 6px 10px;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.fila-activa {
+  background: #fffbeb;
+}
+
+.fila-activa .total-kg {
+  font-weight: 600;
+  color: var(--primario);
+}
+
+/* ---------- Modal ---------- */
+.modal-fondo {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.5);
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 40px 16px;
+  z-index: 40;
+  overflow-y: auto;
+}
+
+.modal {
+  background: var(--superficie);
+  border-radius: var(--radio);
+  padding: 24px;
+  max-width: 860px;
+  width: 100%;
+  box-shadow: 0 10px 40px rgba(15, 23, 42, 0.3);
+}
+
+.modal-acciones {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+/* ---------- Ficha / formulario de producto ---------- */
+.formulario-pan h3 {
+  font-size: 0.95rem;
+  margin: 18px 0 8px;
+}
+
+.titulo-impresion {
+  font-size: 1.1rem;
+  margin: 0 0 12px;
+}
+
+.ficha-datos {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px 18px;
+  border: 1px solid var(--borde);
+  border-radius: var(--radio);
+  padding: 14px;
+}
+
+.ficha-datos > div {
+  display: flex;
+  flex-direction: column;
+}
+
+.ficha-datos span {
+  font-size: 0.75rem;
+  color: var(--texto-suave);
+}
+
+.tabla-proceso .etapa {
+  font-weight: 600;
+  white-space: nowrap;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+}
+
+/* ---------- Impresión dirigida ---------- */
+.solo-impresion {
+  display: none;
+  padding: 8mm 12mm;
+}
+
+/* Documento impreso (Panadería): estilo formal tipo formulario */
+.imp-doc {
+  font-family: 'Fira Sans', system-ui, sans-serif;
+  color: #111827;
+  font-size: 11px;
+}
+
+.imp-banner {
+  border: 1.5px solid #111827;
+  background: #e5e7eb;
+  text-align: center;
+  font-weight: 700;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 6px 16px;
+  max-width: 65%;
+  margin: 0 auto 4px;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+
+.imp-fecha {
+  text-align: center;
+  font-size: 9.5px;
+  margin: 0 0 8px;
+  color: #111827;
+}
+
+.imp-doc table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 9.5px;
+}
+
+.imp-doc th {
+  border: 1px solid #111827;
+  background: #f3f4f6;
+  color: #111827;
+  font-size: 8.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  padding: 3px 6px;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+
+.imp-doc td {
+  border: 1px solid #111827;
+  padding: 2px 6px;
+}
+
+.imp-doc tbody tr {
+  break-inside: avoid;
+}
+
+.imp-doc tfoot td {
+  border: 1px solid #111827;
+  font-weight: 700;
+}
+
+.imp-doc .guia {
+  font-size: 9px;
+}
+
+.imp-doc .titulo-impresion {
+  font-size: 16px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin: 0 0 10px;
+}
+
+.imp-doc h3 {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin: 14px 0 6px;
+}
+
+.imp-doc .ficha-datos {
+  border: 1px solid #111827;
+  border-radius: 0;
+  padding: 10px 14px;
+  gap: 6px 18px;
+  margin-bottom: 4px;
+}
+
+
 /* ---------- Aviso flotante ---------- */
 .aviso {
   position: fixed;
@@ -541,6 +748,10 @@ tfoot td {
     grid-template-columns: 1fr;
   }
 
+  .ficha-datos {
+    grid-template-columns: 1fr;
+  }
+
   .cabecera-contenido {
     justify-content: center;
   }
@@ -550,7 +761,8 @@ tfoot td {
 @media print {
   .cabecera,
   .no-imprimir,
-  .aviso {
+  .aviso,
+  .modal-fondo {
     display: none !important;
   }
 
@@ -564,4 +776,17 @@ tfoot td {
     padding: 0;
     margin-bottom: 24px;
   }
+
+  /* Impresión dirigida (Panadería): se oculta la app y se imprime solo el bloque elegido */
+  body.impresion-activa #root {
+    display: none !important;
+  }
+
+  .solo-impresion {
+    display: block;
+  }
+}
+
+@page {
+  margin: 14mm;
 }
