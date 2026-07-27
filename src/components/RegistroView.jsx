@@ -7,6 +7,30 @@ import {
   siguienteGuia,
 } from '../utils.js'
 
+// Código EAN-13 del tipo elegido, listo para anotar en la guía o copiarlo.
+function CodigoDestacado({ ean }) {
+  const [copiado, setCopiado] = useState(false)
+
+  async function copiar() {
+    try {
+      await navigator.clipboard.writeText(ean)
+      setCopiado(true)
+      window.setTimeout(() => setCopiado(false), 1500)
+    } catch {
+      setCopiado(false)
+    }
+  }
+
+  return (
+    <div className="codigo-destacado">
+      <span className="codigo-valor">{ean}</span>
+      <button type="button" className="boton chico" onClick={copiar}>
+        {copiado ? 'Copiado' : 'Copiar'}
+      </button>
+    </div>
+  )
+}
+
 const FORM_VACIO = {
   guiaEgreso: '',
   guiaIngreso: '',
@@ -49,6 +73,7 @@ export default function RegistroView({
 
   const seccionActual = config.secciones.find((s) => s.nombre === seccion)
   const tipos = seccionActual?.tipos ?? []
+  const tipoSeleccionado = tipos.find((t) => t.nombre === form.tipo)
 
   const registrosDelDia = registros
     .filter((r) => r.seccion === seccion && r.fechaRegistro === fechaRegistro)
@@ -100,6 +125,7 @@ export default function RegistroView({
         guiaEgreso,
         guiaIngreso,
         tipo: form.tipo,
+        ean: tipoSeleccionado?.ean ?? '',
         fechaHizo: form.fechaHizo,
         pesoKg: peso,
       })
@@ -114,6 +140,7 @@ export default function RegistroView({
       guiaEgreso,
       guiaIngreso,
       tipo: form.tipo,
+      ean: tipoSeleccionado?.ean ?? '',
       fechaHizo: form.fechaHizo,
       pesoKg: peso,
       creadoEn: Date.now(),
@@ -193,9 +220,14 @@ export default function RegistroView({
             <select value={form.tipo} onChange={(e) => cambiarCampo('tipo', e.target.value)}>
               <option value="">— Seleccionar —</option>
               {tipos.map((t) => (
-                <option key={t} value={t}>{t}</option>
+                <option key={t.nombre} value={t.nombre}>
+                  {t.ean ? `${t.nombre} — ${t.ean}` : t.nombre}
+                </option>
               ))}
             </select>
+            {tipoSeleccionado?.ean && (
+              <CodigoDestacado ean={tipoSeleccionado.ean} />
+            )}
           </label>
           <label className="campo">
             <span>Fecha que se hizo</span>
@@ -254,6 +286,7 @@ export default function RegistroView({
                   <th>Guía insumo (egreso)</th>
                   <th>Guía producto (ingreso)</th>
                   <th>Tipo</th>
+                  <th>Código EAN-13</th>
                   <th>Fecha que se hizo</th>
                   <th className="numero">Peso (KG)</th>
                   <th className="acciones-col"></th>
@@ -265,6 +298,7 @@ export default function RegistroView({
                     <td className="guia guia-egreso">{r.guiaEgreso}</td>
                     <td className="guia">{r.guiaIngreso}</td>
                     <td>{r.tipo}</td>
+                    <td className="guia">{r.ean || '—'}</td>
                     <td>{formatearFechaCorta(r.fechaHizo)}</td>
                     <td className="numero">{formatearPeso(r.pesoKg)}</td>
                     <td className="acciones-col">
@@ -283,7 +317,7 @@ export default function RegistroView({
               </tbody>
               <tfoot>
                 <tr>
-                  <td colSpan="4">Total del día</td>
+                  <td colSpan="5">Total del día</td>
                   <td className="numero">{formatearPeso(totalDia)}</td>
                   <td></td>
                 </tr>

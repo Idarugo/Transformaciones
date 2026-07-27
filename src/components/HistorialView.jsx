@@ -15,7 +15,7 @@ export default function HistorialView({ registros, config, onEditar, onEliminar 
         if (desde && r.fechaHizo < desde) return false
         if (hasta && r.fechaHizo > hasta) return false
         if (texto) {
-          const pajar = `${r.guiaEgreso} ${r.guiaIngreso} ${r.tipo}`.toLowerCase()
+          const pajar = `${r.guiaEgreso} ${r.guiaIngreso} ${r.tipo} ${r.ean ?? ''}`.toLowerCase()
           if (!pajar.includes(texto)) return false
         }
         return true
@@ -113,6 +113,7 @@ export default function HistorialView({ registros, config, onEditar, onEliminar 
                   <th>Guía insumo (egreso)</th>
                   <th>Guía producto (ingreso)</th>
                   <th>Tipo</th>
+                  <th>Código EAN-13</th>
                   <th>Fecha que se hizo</th>
                   <th>Registrado</th>
                   <th className="numero">Peso (KG)</th>
@@ -126,6 +127,7 @@ export default function HistorialView({ registros, config, onEditar, onEliminar 
                     <td className="guia guia-egreso">{r.guiaEgreso}</td>
                     <td className="guia">{r.guiaIngreso}</td>
                     <td>{r.tipo}</td>
+                    <td className="guia">{r.ean || '—'}</td>
                     <td>{formatearFecha(r.fechaHizo)}</td>
                     <td>{formatearFecha(r.fechaRegistro)}</td>
                     <td className="numero">{formatearPeso(r.pesoKg)}</td>

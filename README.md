@@ -16,12 +16,13 @@ Luego abrir <http://localhost:5173> en el navegador.
 ## Qué hace
 
 - **Registro**: se elige la sección y la fecha del día (como el encabezado del cuaderno)
-  y se anotan las filas. Al agregar una fila, las dos guías quedan pre-cargadas con el
-  número siguiente (correlativo) para anotar la próxima más rápido. Avisa si una guía
-  de insumo ya fue registrada antes.
+  y se anotan las filas. Cada tipo de transformación muestra su **código EAN-13** (en la
+  lista y destacado con botón para copiar), que queda guardado en el registro para
+  anotarlo en la guía sin buscarlo. Al agregar una fila, las dos guías quedan pre-cargadas
+  con el número siguiente (correlativo). Avisa si una guía de insumo ya fue registrada antes.
 - **Historial**: todos los registros con filtros por sección, rango de fechas y búsqueda
-  por número de guía o tipo. Muestra totales de KG, resumen por tipo, y permite
-  **exportar a CSV** (se abre en Excel) e imprimir.
+  por número de guía, tipo o código EAN-13. Muestra totales de KG, resumen por tipo, y
+  permite **exportar a CSV** (se abre en Excel, incluye el código) e imprimir.
 - **Panadería**: producción del día. Se ingresa la cantidad (amasijos) de cada pan y el
   sistema calcula el **total KG** (cantidad × rendimiento de la receta) y las
   **Transformaciones Panadería** (consumo de cada insumo según las recetas, en unidades

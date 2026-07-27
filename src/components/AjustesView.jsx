@@ -1,6 +1,7 @@
 import { useRef, useState } from 'react'
 import { descargarBlob } from '../utils.js'
 import { CONFIG_DEFAULT } from '../config.js'
+import { normalizarConfig } from '../storage.js'
 
 export default function AjustesView({ registros, config, panaderia, onCambiarConfig, onImportar, onBorrarTodo }) {
   const [nuevaSeccion, setNuevaSeccion] = useState('')
@@ -35,24 +36,42 @@ export default function AjustesView({ registros, config, panaderia, onCambiarCon
   }
 
   function agregarTipo(nombreSeccion) {
-    const tipo = (nuevosTipos[nombreSeccion] ?? '').trim()
-    if (!tipo) return
+    const datos = nuevosTipos[nombreSeccion] ?? {}
+    const nombre = (datos.nombre ?? '').trim()
+    const ean = (datos.ean ?? '').trim()
+    if (!nombre) return
     onCambiarConfig({
       ...config,
       secciones: config.secciones.map((s) =>
-        s.nombre === nombreSeccion && !s.tipos.includes(tipo)
-          ? { ...s, tipos: [...s.tipos, tipo] }
+        s.nombre === nombreSeccion && !s.tipos.some((t) => t.nombre === nombre)
+          ? { ...s, tipos: [...s.tipos, { nombre, ean }] }
           : s,
       ),
     })
-    setNuevosTipos((prev) => ({ ...prev, [nombreSeccion]: '' }))
+    setNuevosTipos((prev) => ({ ...prev, [nombreSeccion]: { nombre: '', ean: '' } }))
   }
 
-  function eliminarTipo(nombreSeccion, tipo) {
+  function cambiarEan(nombreSeccion, nombreTipo, ean) {
     onCambiarConfig({
       ...config,
       secciones: config.secciones.map((s) =>
-        s.nombre === nombreSeccion ? { ...s, tipos: s.tipos.filter((t) => t !== tipo) } : s,
+        s.nombre === nombreSeccion
+          ? {
+              ...s,
+              tipos: s.tipos.map((t) => (t.nombre === nombreTipo ? { ...t, ean } : t)),
+            }
+          : s,
+      ),
+    })
+  }
+
+  function eliminarTipo(nombreSeccion, nombreTipo) {
+    onCambiarConfig({
+      ...config,
+      secciones: config.secciones.map((s) =>
+        s.nombre === nombreSeccion
+          ? { ...s, tipos: s.tipos.filter((t) => t.nombre !== nombreTipo) }
+          : s,
       ),
     })
   }
@@ -79,7 +98,10 @@ export default function AjustesView({ registros, config, panaderia, onCambiarCon
         if (seguir) {
           onImportar({
             registros: datos.registros,
-            config: datos.config && Array.isArray(datos.config.secciones) ? datos.config : CONFIG_DEFAULT,
+            config:
+              datos.config && Array.isArray(datos.config.secciones)
+                ? normalizarConfig(datos.config)
+                : CONFIG_DEFAULT,
             panaderia: datos.panaderia && typeof datos.panaderia === 'object' ? datos.panaderia : {},
           })
         }
@@ -110,14 +132,23 @@ export default function AjustesView({ registros, config, panaderia, onCambiarCon
                   Eliminar sección
                 </button>
               </div>
-              <ul className="lista-tipos">
+              <ul className="lista-tipos-ean">
                 {s.tipos.map((t) => (
-                  <li key={t}>
-                    {t}
+                  <li key={t.nombre}>
+                    <span className="tipo-nombre">{t.nombre}</span>
+                    <input
+                      className="entrada-ean"
+                      type="text"
+                      inputMode="numeric"
+                      placeholder="Código EAN-13"
+                      aria-label={`Código EAN-13 de ${t.nombre}`}
+                      value={t.ean}
+                      onChange={(e) => cambiarEan(s.nombre, t.nombre, e.target.value.trim())}
+                    />
                     <button
                       className="quitar"
-                      aria-label={`Quitar ${t}`}
-                      onClick={() => eliminarTipo(s.nombre, t)}
+                      aria-label={`Quitar ${t.nombre}`}
+                      onClick={() => eliminarTipo(s.nombre, t.nombre)}
                     >
                       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" aria-hidden="true">
                         <path d="M18 6 6 18" /><path d="m6 6 12 12" />
@@ -131,9 +162,32 @@ export default function AjustesView({ registros, config, panaderia, onCambiarCon
                 <input
                   type="text"
                   placeholder="Nuevo tipo…"
-                  value={nuevosTipos[s.nombre] ?? ''}
+                  value={nuevosTipos[s.nombre]?.nombre ?? ''}
                   onChange={(e) =>
-                    setNuevosTipos((prev) => ({ ...prev, [s.nombre]: e.target.value }))
+                    setNuevosTipos((prev) => ({
+                      ...prev,
+                      [s.nombre]: { ...prev[s.nombre], nombre: e.target.value },
+                    }))
+                  }
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault()
+                      agregarTipo(s.nombre)
+                    }
+                  }}
+                />
+                <input
+                  className="entrada-ean"
+                  type="text"
+                  inputMode="numeric"
+                  placeholder="EAN-13"
+                  aria-label={`Código del nuevo tipo de ${s.nombre}`}
+                  value={nuevosTipos[s.nombre]?.ean ?? ''}
+                  onChange={(e) =>
+                    setNuevosTipos((prev) => ({
+                      ...prev,
+                      [s.nombre]: { ...prev[s.nombre], ean: e.target.value },
+                    }))
                   }
                   onKeyDown={(e) => {
                     if (e.key === 'Enter') {
