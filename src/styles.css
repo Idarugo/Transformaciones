@@ -537,6 +537,22 @@ tfoot td {
   font-variant-numeric: tabular-nums;
 }
 
+.entrada-cantidad:focus {
+  border-color: var(--primario);
+  box-shadow: 0 0 0 3px rgba(30, 64, 175, 0.15);
+}
+
+kbd {
+  font-family: 'Fira Code', monospace;
+  font-size: 0.75rem;
+  background: var(--fondo);
+  border: 1px solid var(--borde);
+  border-bottom-width: 2px;
+  border-radius: 4px;
+  padding: 1px 5px;
+  color: var(--texto);
+}
+
 .fila-activa {
   background: #fffbeb;
 }

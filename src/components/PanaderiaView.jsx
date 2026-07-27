@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { PANADERIA } from '../panaderia-data.js'
 import { hoyISO, formatearFecha, formatearPeso, parsearPeso } from '../utils.js'
@@ -23,6 +23,7 @@ export default function PanaderiaView({ panaderia, onCambiarCantidad }) {
   const [textos, setTextos] = useState({})
   const [formularioSku, setFormularioSku] = useState(null)
   const [impresion, setImpresion] = useState(null)
+  const camposCantidad = useRef([])
 
   const cantidades = useMemo(() => panaderia[fecha] ?? {}, [panaderia, fecha])
 
@@ -74,6 +75,18 @@ export default function PanaderiaView({ panaderia, onCambiarCantidad }) {
     if (n !== null) onCambiarCantidad(fecha, sku, n)
   }
 
+  // Enter y flechas ↑/↓ mueven el foco entre campos de cantidad, sin usar el mouse.
+  function navegarCampos(e, indice) {
+    const paso = e.key === 'ArrowUp' ? -1 : e.key === 'ArrowDown' || e.key === 'Enter' ? 1 : 0
+    if (paso === 0) return
+    e.preventDefault()
+    const destino = camposCantidad.current[indice + paso]
+    if (destino) {
+      destino.focus()
+      destino.select()
+    }
+  }
+
   const productoFormulario = PANADERIA.productos.find((p) => p.sku === formularioSku)
 
   return (
@@ -113,6 +126,10 @@ export default function PanaderiaView({ panaderia, onCambiarCantidad }) {
             </button>
           </div>
         </div>
+        <p className="pista">
+          Escribe la cantidad y presiona <kbd>Enter</kbd> para pasar al siguiente pan.
+          También puedes moverte con <kbd>↑</kbd> <kbd>↓</kbd>.
+        </p>
         <div className="tabla-envoltura">
           <table>
             <thead>
@@ -126,7 +143,7 @@ export default function PanaderiaView({ panaderia, onCambiarCantidad }) {
               </tr>
             </thead>
             <tbody>
-              {PANADERIA.productos.map((p) => {
+              {PANADERIA.productos.map((p, indice) => {
                 const cantidad = cantidades[p.sku] ?? 0
                 return (
                   <tr key={p.sku} className={cantidad > 0 ? 'fila-activa' : ''}>
@@ -139,8 +156,11 @@ export default function PanaderiaView({ panaderia, onCambiarCantidad }) {
                         inputMode="decimal"
                         placeholder="0"
                         aria-label={`Cantidad de ${p.nombre}`}
+                        ref={(el) => { camposCantidad.current[indice] = el }}
                         value={textos[p.sku] ?? ''}
                         onChange={(e) => cambiarCantidad(p.sku, e.target.value)}
+                        onKeyDown={(e) => navegarCampos(e, indice)}
+                        onFocus={(e) => e.target.select()}
                       />
                     </td>
                     <td className="numero">{formatearPeso(p.rendimientoKg)}</td>
